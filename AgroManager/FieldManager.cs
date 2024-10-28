@@ -11,6 +11,28 @@ namespace AgroManager
             _fieldService = fieldService;
         }
 
+        public void DisplayFieldsWithCrops(Farm farm)
+        {
+            Console.WriteLine("Lista pól z powierzchnią i aktualną uprawą:");
+
+            foreach (var field in farm.FieldsList)
+            {
+                Console.WriteLine($"Pole numer: {field.FieldNumber}, Powierzchnia: {field.AreaInHectares} ha");
+
+                if (field.Crops.Count > 0)
+                {
+                    var latestCrop = field.Crops.Last();
+                    Console.WriteLine($"Aktualna uprawa: {latestCrop.CropType}, Data siewu: {latestCrop.SowingDate.ToShortDateString()}");
+                }
+                else
+                {
+                    Console.WriteLine("Brak aktualnej uprawy na tym polu.");
+                }
+
+                Console.WriteLine();
+            }
+        }
+
         public void AddField(Farm farm)
         {
             Console.WriteLine("Dodaj nowe pole:");
@@ -89,12 +111,13 @@ namespace AgroManager
             int fieldChoice;
             do
             {
-                Console.WriteLine("1. Wyświetl informacje o uprawach na polach");
-                Console.WriteLine("2. Wyświetl informacje o zbiorach z pól");
-                Console.WriteLine("3. Wyświetl informacje o przeprowadzonych zabiegach na polach");
-                Console.WriteLine("4. Edytuj pole");
-                Console.WriteLine("5. Usuń pole");
-                Console.WriteLine("6. Powrót do menu głównego");
+                Console.WriteLine("1. Wyświetl listę pól z powierzchnią i aktualną uprawą");
+                Console.WriteLine("2. Wyświetl informacje o uprawach na polach");
+                Console.WriteLine("3. Wyświetl informacje o zbiorach z pól");
+                Console.WriteLine("4. Wyświetl informacje o przeprowadzonych zabiegach na polach");
+                Console.WriteLine("5. Edytuj pole");
+                Console.WriteLine("6. Usuń pole");
+                Console.WriteLine("7. Powrót do menu głównego");
                 Console.Write("Wybierz opcję: ");
 
                 if (int.TryParse(Console.ReadLine(), out fieldChoice))
@@ -102,21 +125,24 @@ namespace AgroManager
                     switch (fieldChoice)
                     {
                         case 1:
-                            new CropService().DisplayCropsInfo(farm);
+                            DisplayFieldsWithCrops(farm);
                             break;
                         case 2:
-                            new HarvestService().DisplayHarvestsInfo(farm);
+                            new CropService().DisplayCropsInfo(farm);
                             break;
                         case 3:
-                            new TreatmentService().DisplayTreatmentsInfo(farm);
+                            new HarvestService().DisplayHarvestsInfo(farm);
                             break;
                         case 4:
-                            EditField(farm);
+                            new TreatmentService().DisplayTreatmentsInfo(farm);
                             break;
                         case 5:
-                            RemoveField(farm);
+                            EditField(farm);
                             break;
                         case 6:
+                            RemoveField(farm);
+                            break;
+                        case 7:
                             Console.WriteLine("Powrót do menu głównego.");
                             break;
                         default:
@@ -128,7 +154,7 @@ namespace AgroManager
                 {
                     Console.WriteLine("Niepoprawny wybór. Spróbuj ponownie.");
                 }
-            } while (fieldChoice != 6);
+            } while (fieldChoice != 7);
         }
     }
 }
