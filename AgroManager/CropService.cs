@@ -1,51 +1,13 @@
 ﻿using System;
-using System.Linq;
 
 namespace AgroManager
 {
     public class CropService
     {
-        public void AddCrop(Farm farm)
+        public void AddCrop(Farm farm, string fieldNumber, string? cropType, DateTime sowingDate, double areaInHectares)
         {
-            Console.WriteLine("Dodaj nową uprawę:");
-            Console.Write("Numer pola: ");
-            string? fieldNumber = Console.ReadLine();
             Field? field = farm.FieldsList.Find(f => f.FieldNumber == fieldNumber);
-
-            if (field == null)
-            {
-                Console.WriteLine("Pole o podanym numerze nie istnieje.");
-                return;
-            }
-
-            Console.Write("Rodzaj uprawy: ");
-            string? cropType = Console.ReadLine();
-            Console.Write("Data siewu (RRRR-MM-DD): ");
-            if (!DateTime.TryParse(Console.ReadLine(), out DateTime sowingDate))
-            {
-                Console.WriteLine("Niepoprawny format daty.");
-                return;
-            }
-
-            double areaInHectares;
-            while (true)
-            {
-                Console.Write("Obszar w hektarach (ha): ");
-                if (!double.TryParse(Console.ReadLine(), out areaInHectares))
-                {
-                    Console.WriteLine("Niepoprawny format obszaru.");
-                    continue;
-                }
-
-                if (areaInHectares > field.AreaInHectares)
-                {
-                    Console.WriteLine($"Pole jest mniejsze niż podana wartość. Dostępna powierzchnia pola: {field.AreaInHectares} ha.");
-                }
-                else
-                {
-                    break;
-                }
-            }
+            if (field == null) throw new ArgumentException("Pole o podanym numerze nie istnieje.");
 
             Crop newCrop = new Crop
             {
@@ -55,16 +17,20 @@ namespace AgroManager
                 AreaInHectares = areaInHectares
             };
             field.Crops.Add(newCrop);
+        }
 
-            Console.WriteLine("Nowa uprawa została dodana pomyślnie.");
+        public bool IsAreaValid(Farm farm, string? fieldNumber, double areaInHectares)
+        {
+            Field? field = farm.FieldsList.Find(f => f.FieldNumber == fieldNumber);
+            return field != null && areaInHectares <= field.AreaInHectares;
         }
 
         public void DisplayCropsInfo(Farm farm)
         {
-            Console.WriteLine("Informacje o uprawach na polach:");
             foreach (var field in farm.FieldsList)
             {
                 Console.WriteLine($"Pole: {field.FieldNumber}");
+
                 if (field.Crops.Any())
                 {
                     Console.WriteLine("Uprawy:");

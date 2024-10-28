@@ -1,44 +1,15 @@
 ﻿using System;
-using System.Linq;
 
 namespace AgroManager
 {
     public class TreatmentService
     {
-        public void AddTreatment(Farm farm)
+        public void AddTreatment(Farm farm, string fieldNumber, DateTime treatmentDate, string treatmentType, string details)
         {
-            Console.WriteLine("Dodaj nowy zabieg:");
-            Console.Write("Numer pola: ");
-            string? fieldNumber = Console.ReadLine();
             Field? field = farm.FieldsList.Find(f => f.FieldNumber == fieldNumber);
-
             if (field == null)
             {
-                Console.WriteLine("Pole o podanym numerze nie istnieje.");
-                return;
-            }
-
-            Console.Write("Data zabiegu (RRRR-MM-DD): ");
-            if (!DateTime.TryParse(Console.ReadLine(), out DateTime treatmentDate))
-            {
-                Console.WriteLine("Niepoprawny format daty.");
-                return;
-            }
-
-            Console.Write("Typ zabiegu: ");
-            string? treatmentType = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(treatmentType))
-            {
-                Console.WriteLine("Typ zabiegu nie może być pusty.");
-                return;
-            }
-
-            Console.Write("Szczegóły zabiegu: ");
-            string? details = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(details))
-            {
-                Console.WriteLine("Szczegóły zabiegu nie mogą być puste.");
-                return;
+                throw new ArgumentException("Pole o podanym numerze nie istnieje.");
             }
 
             Treatment newTreatment = new Treatment
@@ -48,17 +19,16 @@ namespace AgroManager
                 TreatmentType = treatmentType,
                 Details = details
             };
-            field.Treatments.Add(newTreatment);
 
-            Console.WriteLine("Nowy zabieg został dodany pomyślnie.");
+            field.Treatments.Add(newTreatment);
         }
 
         public void DisplayTreatmentsInfo(Farm farm)
         {
-            Console.WriteLine("Informacje o zabiegach na polach:");
             foreach (var field in farm.FieldsList)
             {
                 Console.WriteLine($"Pole: {field.FieldNumber}");
+
                 if (field.Treatments.Any())
                 {
                     Console.WriteLine("Zabiegi:");

@@ -4,6 +4,7 @@ namespace AgroManager
 {
     public class SoilTest
     {
+        public string FieldNumber { get; set; }
         public DateTime TestDate { get; set; }
         public double PhLevel { get; set; }
         public double Nitrogen { get; set; }

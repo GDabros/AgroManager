@@ -8,5 +8,6 @@ namespace AgroManager
         public string? FarmName { get; set; }
         public string? Location { get; set; }
         public List<Field> FieldsList { get; set; } = new List<Field>();
+        public List<Stock> StockList { get; set; } = new List<Stock>();
     }
 }

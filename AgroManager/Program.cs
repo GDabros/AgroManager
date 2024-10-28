@@ -6,7 +6,7 @@ namespace AgroManager
     {
         static void Main(string[] args)
         {
-            const string version = "0.5.24";
+            const string version = "0.10.24";
             Console.WriteLine("Witaj w aplikacji AgroManager!");
             Console.WriteLine($"Wersja: {version}");
             Console.WriteLine();
@@ -20,12 +20,21 @@ namespace AgroManager
             StockService stockService = new StockService();
             SoilTestService soilTestService = new SoilTestService();
 
-            farmService.CreateFarm(farm);
+            FarmManager farmManager = new FarmManager(farmService);
+            FieldManager fieldManager = new FieldManager(fieldService);
+            CropManager cropManager = new CropManager(cropService);
+            HarvestManager harvestManager = new HarvestManager(harvestService);
+            TreatmentManager treatmentManager = new TreatmentManager(treatmentService);
+            StockManager stockManager = new StockManager(stockService);
+            SoilTestManager soilTestManager = new SoilTestManager(soilTestService);
+
+            farmManager.CreateFarm(farm);
 
             int choice;
             do
             {
                 DisplayMenu();
+
                 if (!int.TryParse(Console.ReadLine(), out choice))
                 {
                     Console.WriteLine("Niepoprawny wybór. Spróbuj ponownie.");
@@ -36,38 +45,38 @@ namespace AgroManager
                 switch (choice)
                 {
                     case 1:
-                        farmService.DisplayFarmInfo(farm);
+                        farmManager.DisplayFarmInfo(farm);
                         break;
                     case 2:
-                        fieldService.AddField(farm);
+                        fieldManager.AddField(farm);
                         break;
                     case 3:
-                        fieldService.DisplayFieldsMenu(farm);
+                        fieldManager.DisplayFieldsMenu(farm);
                         break;
                     case 4:
-                        cropService.AddCrop(farm);
+                        cropManager.AddCrop(farm);
                         break;
                     case 5:
-                        harvestService.AddHarvest(farm);
+                        harvestManager.AddHarvest(farm);
                         break;
                     case 6:
-                        treatmentService.AddTreatment(farm);
+                        treatmentManager.AddTreatment(farm);
                         break;
                     case 7:
-                        stockService.DisplayHarvestStock(farm);
+                        stockManager.DisplayHarvestStock(farm);
                         break;
                     case 8:
-                        soilTestService.AddSoilTest(farm);
+                        soilTestManager.AddSoilTest(farm);
                         break;
                     case 9:
-                        soilTestService.DisplaySoilTests(farm);
+                        soilTestManager.DisplaySoilTests(farm);
                         break;
                     case 10:
-                        farmService.EditFarmDetails(farm);
+                        farmManager.EditFarmDetails(farm);
                         break;
                     case 11:
                         Console.WriteLine();
-                        Console.WriteLine("Program 'Moje Gospodarswto' - został zamknięty!");
+                        Console.WriteLine("Program 'AgroManager' - został zamknięty!");
                         break;
                     default:
                         Console.WriteLine("Niepoprawny wybór. Spróbuj ponownie.");
