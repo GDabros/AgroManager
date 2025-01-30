@@ -1,5 +1,6 @@
 ﻿using AgroManager.Models;
 using System;
+using System.Linq;
 
 namespace AgroManager.Services
 {
@@ -8,8 +9,20 @@ namespace AgroManager.Services
         public void AddCrop(Farm farm, string fieldNumber, string? cropType, DateTime sowingDate, double areaInHectares)
         {
             Field? field = farm.FieldsList.Find(f => f.FieldNumber == fieldNumber);
-            if (field == null) throw new ArgumentException("Pole o podanym numerze nie istnieje.");
 
+            if (field == null)
+            {
+                Console.WriteLine($"Pole o numerze {fieldNumber} nie istnieje.");
+                return;
+            }
+
+            if (areaInHectares > field.AreaInHectares)
+            {
+                Console.WriteLine($"Nie można dodać uprawy. Podana powierzchnia ({areaInHectares} ha) przekracza dostępną powierzchnię pola ({field.AreaInHectares} ha).");
+                return;
+            }
+
+            // Tworzenie nowej uprawy
             Crop newCrop = new Crop
             {
                 FieldNumber = fieldNumber,
@@ -17,13 +30,9 @@ namespace AgroManager.Services
                 SowingDate = sowingDate,
                 AreaInHectares = areaInHectares
             };
-            field.Crops.Add(newCrop);
-        }
 
-        public bool IsAreaValid(Farm farm, string? fieldNumber, double areaInHectares)
-        {
-            Field? field = farm.FieldsList.Find(f => f.FieldNumber == fieldNumber);
-            return field != null && areaInHectares <= field.AreaInHectares;
+            field.Crops.Add(newCrop);
+            Console.WriteLine($"Nowa uprawa ({cropType}) została dodana do pola {fieldNumber}.");
         }
 
         public void DisplayCropsInfo(Farm farm)

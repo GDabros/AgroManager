@@ -15,46 +15,72 @@ namespace AgroManager.Managers
 
         public void AddCrop(Farm farm)
         {
-            Console.WriteLine("Dodaj nową uprawę:");
+            Console.WriteLine("===== Dodaj nową uprawę =====");
+
+            // Pobranie numeru pola
             Console.Write("Numer pola: ");
-            string? fieldNumber = Console.ReadLine();
+            string? fieldNumber = Console.ReadLine()?.Trim();
 
-            Console.Write("Rodzaj uprawy: ");
-            string? cropType = Console.ReadLine();
-
-            Console.Write("Data siewu (RRRR-MM-DD): ");
-            if (!DateTime.TryParse(Console.ReadLine(), out DateTime sowingDate))
+            // Sprawdzenie, czy pole istnieje w gospodarstwie
+            Field? field = farm.FieldsList.Find(f => f.FieldNumber == fieldNumber);
+            if (field == null)
             {
-                Console.WriteLine("Niepoprawny format daty.");
+                Console.WriteLine($"Pole o numerze {fieldNumber} nie istnieje w gospodarstwie.");
                 return;
             }
 
+            // Pobranie rodzaju uprawy
+            string? cropType;
+            do
+            {
+                Console.Write("Rodzaj uprawy: ");
+                cropType = Console.ReadLine()?.Trim();
+                if (string.IsNullOrWhiteSpace(cropType))
+                {
+                    Console.WriteLine("Rodzaj uprawy nie może być pusty.");
+                }
+            } while (string.IsNullOrWhiteSpace(cropType));
+
+            // Pobranie daty siewu
+            DateTime sowingDate;
+            while (true)
+            {
+                Console.Write("Data siewu (RRRR-MM-DD): ");
+                if (DateTime.TryParse(Console.ReadLine(), out sowingDate))
+                {
+                    break;
+                }
+                Console.WriteLine("Niepoprawny format daty. Spróbuj ponownie.");
+            }
+
+            // Pobranie powierzchni uprawy
             double areaInHectares;
             while (true)
             {
                 Console.Write("Obszar w hektarach (ha): ");
-                if (!double.TryParse(Console.ReadLine(), out areaInHectares))
+                if (!double.TryParse(Console.ReadLine(), out areaInHectares) || areaInHectares <= 0)
                 {
-                    Console.WriteLine("Niepoprawny format obszaru.");
+                    Console.WriteLine("Niepoprawny format obszaru. Podaj wartość większą niż 0.");
                     continue;
                 }
 
-                if (_cropService.IsAreaValid(farm, fieldNumber, areaInHectares))
+                if (areaInHectares > field.AreaInHectares)
                 {
-                    _cropService.AddCrop(farm, fieldNumber, cropType, sowingDate, areaInHectares);
-                    Console.WriteLine("Nowa uprawa została dodana pomyślnie.");
-                    break;
+                    Console.WriteLine($"Podana powierzchnia ({areaInHectares} ha) przekracza dostępny obszar pola ({field.AreaInHectares} ha).");
+                    continue;
                 }
-                else
-                {
-                    Console.WriteLine($"Pole jest mniejsze niż podana wartość.");
-                }
+
+                break;
             }
+
+            // Dodanie uprawy
+            _cropService.AddCrop(farm, fieldNumber!, cropType, sowingDate, areaInHectares);
+            Console.WriteLine($"Nowa uprawa ({cropType}) została dodana do pola {fieldNumber}.");
         }
 
         public void DisplayCropsInfo(Farm farm)
         {
-            Console.WriteLine("Informacje o uprawach na polach:");
+            Console.WriteLine("===== Informacje o uprawach na polach =====");
             _cropService.DisplayCropsInfo(farm);
         }
     }

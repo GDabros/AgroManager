@@ -1,6 +1,8 @@
 ﻿using AgroManager.Models;
 using AgroManager.Services;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AgroManager.Managers
 {
@@ -13,41 +15,67 @@ namespace AgroManager.Managers
             _farmService = farmService;
         }
 
-        public void CreateFarm(Farm farm)
+        public void CreateFarm()
         {
             Console.WriteLine("===== Utwórz nowe gospodarstwo: =====");
 
             Console.Write("Nazwa gospodarstwa: ");
-            string? farmName = Console.ReadLine() ?? string.Empty;
+            string? farmName = Console.ReadLine()?.Trim();
             while (string.IsNullOrWhiteSpace(farmName))
             {
                 Console.WriteLine("Nazwa gospodarstwa nie może być pusta. Spróbuj ponownie.");
-                farmName = Console.ReadLine() ?? string.Empty;
+                farmName = Console.ReadLine()?.Trim();
             }
 
             Console.Write("Lokalizacja: ");
-            string? location = Console.ReadLine() ?? string.Empty;
+            string? location = Console.ReadLine()?.Trim();
             while (string.IsNullOrWhiteSpace(location))
             {
                 Console.WriteLine("Lokalizacja gospodarstwa nie może być pusta. Spróbuj ponownie.");
-                location = Console.ReadLine() ?? string.Empty;
+                location = Console.ReadLine()?.Trim();
             }
 
-            _farmService.CreateFarm(farm, farmName, location);
+            _farmService.AddFarm(farmName, location);
             Console.WriteLine("Gospodarstwo zostało pomyślnie utworzone.");
         }
 
-        public void DisplayFarmInfo(Farm farm)
+        public void DisplayAllFarms()
         {
-            Console.WriteLine("Informacje o gospodarstwie:");
-            _farmService.DisplayFarmInfo(farm);
+            List<Farm> farms = _farmService.GetAllFarms();
+
+            if (farms.Count == 0)
+            {
+                Console.WriteLine("Brak gospodarstw w systemie.");
+                return;
+            }
+
+            Console.WriteLine("\nLista gospodarstw:");
+            foreach (var farm in farms)
+            {
+                Console.WriteLine($"[{farm.Id}] {farm.FarmName} - {farm.Location}");
+            }
         }
 
-        public void EditFarmDetails(Farm farm)
+        public void DisplayFarmInfo()
         {
-            Console.WriteLine("Edytuj dane gospodarstwa:");
-            Console.WriteLine("1. Edytuj nazwę gospodarstwa");
-            Console.WriteLine("2. Edytuj lokalizację");
+            Farm? farm = SelectFarm();
+            if (farm == null) return;
+
+            Console.WriteLine("\nInformacje o gospodarstwie:");
+            Console.WriteLine($"Nazwa: {farm.FarmName}");
+            Console.WriteLine($"Lokalizacja: {farm.Location}");
+            Console.WriteLine($"Liczba pól: {farm.FieldsList.Count}");
+            Console.WriteLine($"Łączna powierzchnia: {farm.FieldsList.Sum(field => field.AreaInHectares)} ha");
+        }
+
+        public void EditFarmDetails()
+        {
+            Farm? farm = SelectFarm();
+            if (farm == null) return;
+
+            Console.WriteLine("\nEdytuj dane gospodarstwa:");
+            Console.WriteLine("1. Zmień nazwę gospodarstwa");
+            Console.WriteLine("2. Zmień lokalizację");
             Console.WriteLine("3. Powrót do menu głównego");
             Console.Write("Wybierz opcję: ");
 
@@ -57,10 +85,10 @@ namespace AgroManager.Managers
                 {
                     case 1:
                         Console.Write("Nowa nazwa gospodarstwa: ");
-                        string? newFarmName = Console.ReadLine();
+                        string? newFarmName = Console.ReadLine()?.Trim();
                         if (!string.IsNullOrWhiteSpace(newFarmName))
                         {
-                            _farmService.EditFarmName(farm, newFarmName);
+                            _farmService.EditFarmName(farm.Id, newFarmName);
                             Console.WriteLine("Nazwa gospodarstwa została zaktualizowana.");
                         }
                         else
@@ -70,10 +98,10 @@ namespace AgroManager.Managers
                         break;
                     case 2:
                         Console.Write("Nowa lokalizacja: ");
-                        string? newLocation = Console.ReadLine();
+                        string? newLocation = Console.ReadLine()?.Trim();
                         if (!string.IsNullOrWhiteSpace(newLocation))
                         {
-                            _farmService.EditFarmLocation(farm, newLocation);
+                            _farmService.EditFarmLocation(farm.Id, newLocation);
                             Console.WriteLine("Lokalizacja gospodarstwa została zaktualizowana.");
                         }
                         else
@@ -93,6 +121,43 @@ namespace AgroManager.Managers
             {
                 Console.WriteLine("Niepoprawny wybór. Spróbuj ponownie.");
             }
+        }
+
+        public Farm? SelectFarm()
+        {
+            List<Farm> farms = _farmService.GetAllFarms();
+
+            if (farms.Count == 0)
+            {
+                Console.WriteLine("Brak gospodarstw w systemie.");
+                return null;
+            }
+
+            Console.WriteLine("\nWybierz gospodarstwo:");
+            foreach (var farm in farms)
+            {
+                Console.WriteLine($"[{farm.Id}] {farm.FarmName} - {farm.Location}");
+            }
+
+            Console.Write("\nPodaj ID gospodarstwa: ");
+            if (int.TryParse(Console.ReadLine(), out int farmId))
+            {
+                Farm? selectedFarm = _farmService.GetFarmById(farmId);
+                if (selectedFarm != null)
+                {
+                    return selectedFarm;
+                }
+                else
+                {
+                    Console.WriteLine("Nie znaleziono gospodarstwa o podanym ID.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Niepoprawne ID. Spróbuj ponownie.");
+            }
+
+            return null;
         }
     }
 }

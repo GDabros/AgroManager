@@ -1,32 +1,47 @@
 ﻿using AgroManager.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace AgroManager
+namespace AgroManager.Services
 {
     public class FarmService
     {
-        public void CreateFarm(Farm farm, string farmName, string location)
+        private readonly List<Farm> _farms = new(); // Lista przechowująca gospodarstwa
+
+        public void AddFarm(string farmName, string location)
         {
-            farm.FarmName = farmName;
-            farm.Location = location;
+            int newId = _farms.Count + 1; // Generowanie unikalnego ID gospodarstwa
+            Farm newFarm = new Farm(newId, farmName, location); // Teraz przekazujemy ID
+            _farms.Add(newFarm);
         }
 
-        public void DisplayFarmInfo(Farm farm)
+        public Farm? GetFarmById(int id)
         {
-            Console.WriteLine($"Nazwa gospodarstwa: {farm.FarmName}");
-            Console.WriteLine($"Lokalizacja: {farm.Location}");
-            Console.WriteLine($"Liczba pól: {farm.FieldsList.Count}");
-            Console.WriteLine($"Hektary łącznie: {farm.FieldsList.Sum(field => field.AreaInHectares)}");
+            return _farms.FirstOrDefault(f => f.Id == id);
         }
 
-        public void EditFarmName(Farm farm, string newFarmName)
+        public List<Farm> GetAllFarms()
         {
-            farm.FarmName = newFarmName;
+            return _farms;
         }
 
-        public void EditFarmLocation(Farm farm, string newLocation)
+        public void EditFarmName(int id, string newFarmName)
         {
-            farm.Location = newLocation;
+            var farm = GetFarmById(id);
+            if (farm != null)
+            {
+                farm.FarmName = newFarmName;
+            }
+        }
+
+        public void EditFarmLocation(int id, string newLocation)
+        {
+            var farm = GetFarmById(id);
+            if (farm != null)
+            {
+                farm.Location = newLocation;
+            }
         }
     }
 }

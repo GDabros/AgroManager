@@ -1,6 +1,7 @@
 ﻿using AgroManager.Models;
 using AgroManager.Services;
 using System;
+using System.Globalization;
 
 namespace AgroManager.Managers
 {
@@ -15,62 +16,101 @@ namespace AgroManager.Managers
 
         public void AddSoilTest(Farm farm)
         {
-            Console.WriteLine("Dodaj nowe badanie gleby:");
-            Console.Write("Numer pola: ");
-            string? fieldNumber = Console.ReadLine();
+            Console.WriteLine("===== Dodaj nowe badanie gleby =====");
 
-            Console.Write("Data badania (RRRR-MM-DD): ");
-            if (!DateTime.TryParse(Console.ReadLine(), out DateTime testDate))
+            string? fieldNumber;
+            Field? field;
+            do
             {
+                Console.Write("Podaj numer pola: ");
+                fieldNumber = Console.ReadLine()?.Trim();
+
+                field = farm.FieldsList.Find(f => f.FieldNumber == fieldNumber);
+                if (field == null)
+                {
+                    Console.WriteLine($"Pole o numerze {fieldNumber} nie istnieje w gospodarstwie. Spróbuj ponownie.");
+                }
+
+            } while (field == null);
+
+            // Pobranie daty badania
+            DateTime testDate;
+            while (true)
+            {
+                Console.Write("Data badania (RRRR-MM-DD): ");
+                if (DateTime.TryParse(Console.ReadLine(), out testDate))
+                {
+                    break;
+                }
                 Console.WriteLine("Niepoprawny format daty. Spróbuj ponownie.");
-                return;
             }
 
-            Console.Write("Poziom pH: ");
-            if (!double.TryParse(Console.ReadLine(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double phLevel))
+            // Pobranie poziomu pH
+            double phLevel;
+            while (true)
             {
-                Console.WriteLine("Niepoprawny format poziomu pH.");
-                return;
+                Console.Write("Poziom pH: ");
+                if (double.TryParse(Console.ReadLine(), NumberStyles.Any, CultureInfo.InvariantCulture, out phLevel) && phLevel >= 0 && phLevel <= 14)
+                {
+                    break;
+                }
+                Console.WriteLine("Niepoprawna wartość pH. Podaj liczbę od 0 do 14.");
             }
 
-            Console.Write("Azot (N) w mg/kg: ");
-            if (!double.TryParse(Console.ReadLine(), out double nitrogen))
+            // Pobranie azotu (N) w mg/kg
+            double nitrogen;
+            while (true)
             {
-                Console.WriteLine("Niepoprawny format zawartości azotu.");
-                return;
+                Console.Write("Azot (N) w mg/kg: ");
+                if (double.TryParse(Console.ReadLine(), out nitrogen) && nitrogen >= 0)
+                {
+                    break;
+                }
+                Console.WriteLine("Niepoprawna wartość azotu. Podaj wartość większą lub równą 0.");
             }
 
-            Console.Write("Fosfor (P) w mg/kg: ");
-            if (!double.TryParse(Console.ReadLine(), out double phosphorus))
+            // Pobranie fosforu (P) w mg/kg
+            double phosphorus;
+            while (true)
             {
-                Console.WriteLine("Niepoprawny format zawartości fosforu.");
-                return;
+                Console.Write("Fosfor (P) w mg/kg: ");
+                if (double.TryParse(Console.ReadLine(), out phosphorus) && phosphorus >= 0)
+                {
+                    break;
+                }
+                Console.WriteLine("Niepoprawna wartość fosforu. Podaj wartość większą lub równą 0.");
             }
 
-            Console.Write("Potas (K) w mg/kg: ");
-            if (!double.TryParse(Console.ReadLine(), out double potassium))
+            // Pobranie potasu (K) w mg/kg
+            double potassium;
+            while (true)
             {
-                Console.WriteLine("Niepoprawny format zawartości potasu.");
-                return;
+                Console.Write("Potas (K) w mg/kg: ");
+                if (double.TryParse(Console.ReadLine(), out potassium) && potassium >= 0)
+                {
+                    break;
+                }
+                Console.WriteLine("Niepoprawna wartość potasu. Podaj wartość większą lub równą 0.");
             }
 
-            Console.Write("Dodatkowe uwagi: ");
-            string? additionalNotes = Console.ReadLine();
+            // Pobranie dodatkowych uwag
+            Console.Write("Dodatkowe uwagi (opcjonalnie): ");
+            string? additionalNotes = Console.ReadLine()?.Trim();
 
             try
             {
-                _soilTestService.AddSoilTest(farm, fieldNumber, testDate, phLevel, nitrogen, phosphorus, potassium, additionalNotes);
-                Console.WriteLine("Nowe badanie gleby zostało dodane pomyślnie.");
+                _soilTestService.AddSoilTest(farm, fieldNumber!, testDate, phLevel, nitrogen, phosphorus, potassium, additionalNotes);
+                Console.WriteLine($"Nowe badanie gleby dla pola {fieldNumber} zostało dodane pomyślnie.");
             }
             catch (ArgumentException e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine($"Błąd: {e.Message}");
             }
         }
 
         public void DisplaySoilTests(Farm farm)
         {
-            Console.WriteLine("Wyświetl badania gleby:");
+            Console.WriteLine("===== Wyświetl badania gleby =====");
             _soilTestService.DisplaySoilTests(farm);
         }
     }
