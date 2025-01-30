@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AgroManager
+namespace AgroManager.Models
 {
     public class Treatment
     {

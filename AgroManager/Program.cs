@@ -1,4 +1,7 @@
-﻿using System;
+﻿using AgroManager.Managers;
+using AgroManager.Models;
+using AgroManager.Services;
+using System;
 
 namespace AgroManager
 {

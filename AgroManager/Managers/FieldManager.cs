@@ -1,6 +1,8 @@
-﻿using System;
+﻿using AgroManager.Models;
+using AgroManager.Services;
+using System;
 
-namespace AgroManager
+namespace AgroManager.Managers
 {
     public class FieldManager
     {

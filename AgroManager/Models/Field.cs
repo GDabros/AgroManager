@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AgroManager
+namespace AgroManager.Models
 {
     public class Field
     {

@@ -1,6 +1,7 @@
-﻿using System;
+﻿using AgroManager.Models;
+using System;
 
-namespace AgroManager
+namespace AgroManager.Services
 {
     public class HarvestService
     {

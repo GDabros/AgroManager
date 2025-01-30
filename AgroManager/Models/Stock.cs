@@ -1,4 +1,4 @@
-﻿namespace AgroManager
+﻿namespace AgroManager.Models
 {
     public class Stock
     {

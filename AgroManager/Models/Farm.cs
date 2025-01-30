@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace AgroManager
+namespace AgroManager.Models
 {
     public class Farm
     {
